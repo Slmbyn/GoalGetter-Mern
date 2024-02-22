@@ -6,12 +6,15 @@ const logger = require('morgan');
 const cors = require('cors')
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
+const passport = require('passport')
 const TodoModel = require('./Models/Todo')
 
 require('dotenv').config()
 
 // Connect to the database
 require('./config/database');
+
+require('./config/passport');
 
 // Create our express app
 const app = express();
@@ -22,6 +25,9 @@ app.use(cors())
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'build'))); // DOUBLE CHECK THE BUILD DIRECTORY AFTER SETTING UP REACT
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 app.use(session({
     secret: process.env.SECRET,
