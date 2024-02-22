@@ -5,6 +5,7 @@ const path = require('path');
 const logger = require('morgan');
 const cors = require('cors')
 const session = require('express-session')
+const cookieParser = require('cookie-parser')
 const TodoModel = require('./Models/Todo')
 
 require('dotenv').config()
