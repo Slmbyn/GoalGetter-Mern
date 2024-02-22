@@ -7,9 +7,13 @@ const cors = require('cors')
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
-const TodoModel = require('./Models/Todo')
+const router = require('express').Router();
 
 require('dotenv').config()
+
+// Models
+const TodoModel = require('./Models/Todo')
+
 
 // Connect to the database
 require('./config/database');
@@ -35,6 +39,11 @@ app.use(session({
     saveUninitialized: true
 }));
 
+app.use(function (req, res, next) {
+    res.locals.user = req.user;
+    next();
+});
+
 // API Routes:
 app.post('/add', (req, res) => {
     const task = req.body.task;
@@ -43,6 +52,37 @@ app.post('/add', (req, res) => {
     }).then(result => res.json(result))
     .catch(err => res.json(err))
 })
+
+// User Login Routes:
+
+    // Google OAuth login route
+router.get('/auth/google', passport.authenticate(
+    // Which passport strategy is being used?
+    'google',
+    {
+      // Requesting the user's profile and email
+      scope: ['profile', 'email'],
+      // Optionally force pick account every time
+      // prompt: "select_account"
+    }
+));
+
+    // Google OAuth callback route
+    // Google will call after the user confirms
+router.get('/oauth2callback', passport.authenticate(
+    'google',
+    {
+      successRedirect: '/home',
+      failureRedirect: '/home'
+    }
+));
+
+// OAuth logout route
+router.get('/logout', function(req, res){
+    req.logout(function() {
+      res.redirect('/home');
+    });
+  });
 
 // Tell the app to listen on port 3000
 // for HTTP requests from clients
