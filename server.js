@@ -4,6 +4,7 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const cors = require('cors')
+const session = require('express-session')
 const TodoModel = require('./Models/Todo')
 
 require('dotenv').config()
@@ -18,8 +19,14 @@ const app = express();
 app.use(logger('dev'));
 app.use(cors())
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'build'))); // DOUBLE CHECK THE BUILD DIRECTORY AFTER SETTING UP REACT
 
+app.use(session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true
+}));
 
 // API Routes:
 app.post('/add', (req, res) => {
